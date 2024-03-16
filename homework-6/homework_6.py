@@ -203,6 +203,22 @@ WHERE email = '{email}'
             return ['User', i[1], i[0]]
 
 
+def count_tasks(id):
+    # Счет количества незавершенных задач пользователя
+    cur.execute(f'''
+SELECT
+    count(id)
+FROM 
+    Tasks 
+WHERE 
+    id_user = '{id}' AND 
+    status = 'not finished'
+    ''')
+    for i in cur.fetchall():
+        for j in i:
+            return j
+
+
 # ---------------------------------------------------------------------------------------------------------------------
 
 with sqlite3.connect('task_management_system.db') as con:
@@ -239,6 +255,10 @@ while True:
                         login_users(check_main)[2]
                     if main_name == 'Admin':
                         main = 'Admin'
+                    with sqlite3.connect('task_management_system.db') as con:
+                        cur = con.cursor()
+                        tasks = count_tasks(main_id)
+                        print(f'{main_name}, у Вас {tasks} незавершенных задач')
         elif command == 0:
             print('\nПрограмма успешно завершена. База данных сохранена как "task_management_system.db"')
             break
